@@ -1,10 +1,4 @@
 var Hapi = require('hapi');
-var Joi = require('joi');
-var lout = require('lout');
-
-var MemoryStream = require('memorystream');
-var memStream = new MemoryStream(['Hello',' ']);
-
 var Stream = require('stream');
 
 var server = new Hapi.Server(8081, 'localhost', {
@@ -22,7 +16,7 @@ server.route({
   path: '/',
   method: 'GET',
   handler: function(request, reply) {
-    reply.view('room', { first: '', last: '', age: '', color: ''})
+    reply.view('room')
   }
 })
 
@@ -76,3 +70,11 @@ process.on('exit', function(code) {
 process.on('SIGINT', function() {
   channel.end();
 });
+
+module.exports.server = server;
+module.exports.channel = channel;
+module.exports.reloadChannel = function() {
+  if (channel) channel.end();
+  module.exports.channel = channel = new Stream.PassThrough();
+};
+
