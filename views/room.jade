@@ -13,8 +13,12 @@ html
         img(src="/static/images/#{mood}.jpeg", width=200)
         p That's all I know...
 
-      #response
+        #response
 
+        form(action='/room/messages', method='post')
+          textarea#newmessage(name="message")
+          br
+          input(type='submit', value='Send')
 
 script.
   var http = new XMLHttpRequest();
