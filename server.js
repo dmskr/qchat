@@ -1,12 +1,7 @@
 var Hapi = require('hapi');
 var Stream = require('stream');
 
-var server = new Hapi.Server(8081, 'localhost', {
-  views: {
-    engines: { },
-    path: './views'
-  }
-});
+var server = new Hapi.Server(8081, 'localhost');
 
 var channel = new Stream.PassThrough();
 var users = [];
