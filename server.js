@@ -11,14 +11,7 @@ var server = new Hapi.Server(8081, 'localhost', {
 });
 
 var channel = new Stream.PassThrough();
-
-//server.route({
-  //path: '/',
-  //method: 'GET',
-  //handler: function(request, reply) {
-    //reply.view('room')
-  //}
-//})
+var users = [];
 
 server.route({
   path: '/room/messages',
