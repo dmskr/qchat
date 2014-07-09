@@ -50,12 +50,15 @@ Lab.experiment('Server', function() {
     });
   });
   Lab.experiment('POST /room/messages', function() {
-    Lab.test("should post messages to the main channel", function(done) {
+    Lab.test("should post messages to the main channel in JSON format", function(done) {
       var options = {
         method: 'POST',
         url: '/room/messages',
         payload: {
-          message: "Qu-Qquu."
+          message: {
+            text: "Qu-Qquu.",
+            sender: "Hipster"
+          }
         }
       };
 
@@ -64,7 +67,7 @@ Lab.experiment('Server', function() {
         result += chunk.toString();
       });
       app.server.inject(options, function(response) {
-        Lab.expect(result).to.equal('Qu-Qquu.');
+        Lab.expect(result).to.equal(JSON.stringify(options.payload.message));
         done();
       });
     });

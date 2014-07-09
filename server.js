@@ -12,13 +12,13 @@ var server = new Hapi.Server(8081, 'localhost', {
 
 var channel = new Stream.PassThrough();
 
-server.route({
-  path: '/',
-  method: 'GET',
-  handler: function(request, reply) {
-    reply.view('room')
-  }
-})
+//server.route({
+  //path: '/',
+  //method: 'GET',
+  //handler: function(request, reply) {
+    //reply.view('room')
+  //}
+//})
 
 server.route({
   path: '/room/messages',
@@ -43,19 +43,19 @@ server.route({
   path: '/room/messages',
   method: 'POST',
   handler: function(request, reply) {
-    channel.write(request.payload.message);
+    channel.write(JSON.stringify(request.payload.message));
     reply.redirect('/');
   }
 })
 
 server.route({
-  path: '/static/{path*}',
+  path: '/{path*}',
   method: 'GET',
   handler: {
     directory: {
-      path: './public',
+      path: './static',
       listing: false,
-      index: false
+      index: true
     }
   }
 })
@@ -64,12 +64,12 @@ server.start(function() {
   console.log("Hapi server started @ " + server.info.uri);
 });
 
-process.on('exit', function(code) {
-  channel.end();
-});
-process.on('SIGINT', function() {
-  channel.end();
-});
+//process.on('exit', function(code) {
+  //channel.end();
+//});
+//process.on('SIGINT', function() {
+  //channel.end();
+//});
 
 module.exports.server = server;
 module.exports.channel = channel;
