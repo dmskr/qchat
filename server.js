@@ -3,9 +3,7 @@ var Stream = require('stream');
 
 var server = new Hapi.Server(8081, 'localhost', {
   views: {
-    engines: {
-      jade: require('jade')
-    },
+    engines: { },
     path: './views'
   }
 });
