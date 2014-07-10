@@ -35,6 +35,7 @@ qchatApp.controller('MessagesList', ['$scope', '$http', '$timeout', function($sc
         'type': 'newuser',
         'createdAt': new Date()
       });
+      $scope.refreshUsers();
     }
   }
 
