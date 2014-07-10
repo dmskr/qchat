@@ -88,7 +88,7 @@ Lab.experiment('Server', function() {
 
       app.server.inject(options, function(response) {
         Lab.expect(app.room.users.length).to.equal(1);
-        Lab.expect(app.room.users[0]).to.equal('Hipster');
+        Lab.expect(app.room.users[0].name).to.equal('Hipster');
         done();
       });
     });
@@ -108,7 +108,7 @@ Lab.experiment('Server', function() {
         app.server.inject(options, function(response) {
           app.server.inject(options, function(response) {
             Lab.expect(app.room.users.length).to.equal(1);
-            Lab.expect(app.room.users[0]).to.equal('Hipster');
+            Lab.expect(app.room.users[0].name).to.equal('Hipster');
             done();
           });
         });
