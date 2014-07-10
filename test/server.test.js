@@ -1,9 +1,12 @@
 var Lab = require('lab'),
-    app = require('../server');
+    app = require('../server'),
+    Stream = require('stream');
 
 Lab.experiment('Server', function() {
   Lab.beforeEach(function(done) {
-    app.reloadChannel();
+    if (app.room.channel) app.room.channel.end();
+    app.room.channel = new Stream.PassThrough(); // Reload channel
+    app.room.users = []; // Reload user list
     done();
   });
   Lab.experiment('Root page', function() {
@@ -26,7 +29,7 @@ Lab.experiment('Server', function() {
         url: '/room/messages'
       };
 
-      app.channel.end(); // End the messages stream
+      app.room.channel.end(); // End the messages stream
 
       app.server.inject(options, function(response) {
         Lab.expect(response.headers.connection).to.equal('keep-alive');
@@ -40,8 +43,8 @@ Lab.experiment('Server', function() {
         url: '/room/messages'
       };
 
-      app.channel.write('Hey, QChatters');
-      app.channel.end(); // End the messages stream
+      app.room.channel.write('Hey, QChatters');
+      app.room.channel.end(); // End the messages stream
 
       app.server.inject(options, function(response) {
         Lab.expect(response.payload).to.equal('Hey, QChatters');
@@ -63,11 +66,67 @@ Lab.experiment('Server', function() {
       };
 
       var result = '';
-      app.channel.on('data', function(chunk) {
+      app.room.channel.on('data', function(chunk) {
         result += chunk.toString();
       });
       app.server.inject(options, function(response) {
         Lab.expect(result).to.equal(JSON.stringify(options.payload.message));
+        done();
+      });
+    });
+    Lab.test("should store the sender in a list of users connected to the room", function(done) {
+      var options = {
+        method: 'POST',
+        url: '/room/messages',
+        payload: {
+          message: {
+            text: "Qu-Qquu.",
+            sender: "Hipster"
+          }
+        }
+      };
+
+      app.server.inject(options, function(response) {
+        Lab.expect(app.room.users.length).to.equal(1);
+        Lab.expect(app.room.users[0]).to.equal('Hipster');
+        done();
+      });
+    });
+    Lab.test("should store the sender only once", function(done) {
+      var options = {
+        method: 'POST',
+        url: '/room/messages',
+        payload: {
+          message: {
+            text: "Qu-Qquu.",
+            sender: "Hipster"
+          }
+        }
+      };
+
+      app.server.inject(options, function(response) {
+        app.server.inject(options, function(response) {
+          app.server.inject(options, function(response) {
+            Lab.expect(app.room.users.length).to.equal(1);
+            Lab.expect(app.room.users[0]).to.equal('Hipster');
+            done();
+          });
+        });
+      });
+    });
+  });
+  Lab.experiment('GET /room/users', function() {
+    Lab.test('should return all users connected to the room', function(done) {
+      var options = {
+        method: 'GET',
+        url: '/room/users'
+      };
+
+      app.room.users = ['Hipster', 'Fellow'];
+      app.server.inject(options, function(response) {
+        Lab.expect(response.result.users.length).to.equal(2);
+        Lab.expect(response.result.users[0]).to.equal('Hipster');
+        Lab.expect(response.result.users[1]).to.equal('Fellow');
         done();
       });
     });

@@ -1,17 +1,20 @@
+require('sugar');
+
 var Hapi = require('hapi');
 var Stream = require('stream');
 
 var server = new Hapi.Server(8081, 'localhost');
 
-var channel = new Stream.PassThrough();
-var users = [];
+var room = {};
+room.channel = new Stream.PassThrough();
+room.users = [];
 
 server.route({
   path: '/room/messages',
   method: 'GET',
   handler: function(request, reply) {
     var messages = new Stream.PassThrough();
-    var response = reply(channel.pipe(messages));
+    var response = reply(room.channel.pipe(messages));
     response.code(200)
       .type('text/messages')
       .header('Connection', 'keep-alive')
@@ -19,8 +22,14 @@ server.route({
       .header('Content-Encoding', 'identity');
 
     request.once('disconnect', function () {
+      room.users.remove(function(user) { return user.name == request.query.user; });
+      room.channel.write(JSON.stringify({
+        'type': 'newuser',
+        'sender': request.query.user,
+        'text': '[left the chat]',
+        'createdAt': new Date()
+      }));
       messages.end();
-      console.log('Listener closed');
     });
   }
 })
@@ -29,8 +38,23 @@ server.route({
   path: '/room/messages',
   method: 'POST',
   handler: function(request, reply) {
-    channel.write(JSON.stringify(request.payload.message));
+    var sender = (request.payload.message || {}).sender;
+    if (!room.users.find(function(user) { return user.name == sender; })) {
+      room.users.push({
+        joinedAt: new Date(),
+        name: sender
+      });
+    }
+    room.channel.write(JSON.stringify(request.payload.message));
     reply.redirect('/');
+  }
+})
+
+server.route({
+  path: '/room/users',
+  method: 'GET',
+  handler: function(request, reply) {
+    reply({ users: room.users });
   }
 })
 
@@ -51,16 +75,12 @@ server.start(function() {
 });
 
 //process.on('exit', function(code) {
-  //channel.end();
+  //room.channel.end();
 //});
 //process.on('SIGINT', function() {
-  //channel.end();
+  //room.channel.end();
 //});
 
 module.exports.server = server;
-module.exports.channel = channel;
-module.exports.reloadChannel = function() {
-  if (channel) channel.end();
-  module.exports.channel = channel = new Stream.PassThrough();
-};
+module.exports.room = room;
 

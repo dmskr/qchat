@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "angular": "~1.2.19",
-    "bootstrap": "~3.2.0"
+    "bootstrap": "~3.2.0",
+    "sugar": "~1.4.1"
   }
 }
