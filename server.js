@@ -3,11 +3,28 @@ require('sugar');
 var Hapi = require('hapi');
 var Stream = require('stream');
 
-var server = new Hapi.Server(8081, 'localhost');
+var server = new Hapi.Server(8081, 'localhost', {
+  views: {
+    engines: {
+      html: require('ejs')
+    },
+    path: 'static'
+  }
+});
 
 var room = {};
 room.channel = new Stream.PassThrough();
 room.users = [];
+
+var startTime = new Date();
+
+server.route({
+  path: '/',
+  method: 'GET',
+  handler: function(request, reply) {
+    reply.view('index', { st: startTime.getTime() });
+  }
+})
 
 server.route({
   path: '/room/messages',

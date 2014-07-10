@@ -1,6 +1,6 @@
 {
   "name": "qchat",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Super Cool Chat",
   "main": "server.js",
   "scripts": {
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "bower": "^1.3.7",
+    "ejs": "^1.0.0",
     "hapi": "^6.0.2",
     "lab": "^3.2.1",
     "sugar": "^1.4.1"

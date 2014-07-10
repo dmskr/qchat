@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <title>Hello, QPerson | QChat</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css"></link>
-    <link rel="stylesheet" href="/css/index.css"></link>
+    <link rel="stylesheet" href="/css/index.css?version=<%= st%>"></link>
 
     <script src="/lib/jquery/dist/jquery.js"></script>
     <script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
     <script src="/lib/sugar/release/sugar.min.js"></script>
     <script src="/lib/angular/angular.js"></script>
-    <script src="/js/controllers.js"></script>
+    <script src="/js/controllers.js?version=<%= st%>"></script>
   </head>
   <body ng-controller='MessagesList'>
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -63,10 +63,6 @@
           <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
           <strong>Be calm!</strong> Don't offend others. Read our <a href='#' data-toggle="modal" data-target="#terms">Terms</a>
         </div>
-
-
-
-
 
         <div>
           <div class="media" ng-repeat="message in messages">
